@@ -20,7 +20,7 @@ func (user *User) Insert(db *sql.DB) error {
 	}
 	f := func(tx *sql.Tx) error {
 		query := "INSERT INTO users(`name`,`google_id`,`icon_path`) VALUES (?,?,?)"
-		_, err := tx.Exec(query, user.Name, user.GoogleId)
+		_, err := tx.Exec(query, user.Name, user.GoogleId, user.IconPath)
 		if err != nil {
 			return err
 		}
