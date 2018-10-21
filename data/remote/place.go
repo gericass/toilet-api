@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"encoding/xml"
 	"fmt"
+	"path/filepath"
 )
 
 type Place struct {
@@ -58,7 +59,7 @@ type Place struct {
 }
 
 type key struct {
-	key string
+	Key string
 }
 
 type Result struct {
@@ -73,11 +74,15 @@ type Coordinate struct {
 
 func getKey() (string, error) {
 	var key key
-	_, err := toml.DecodeFile("key.toml", &key)
+	path, err := filepath.Abs("key.toml")
 	if err != nil {
 		return "", err
 	}
-	return key.key, nil
+	_, err = toml.DecodeFile(path, &key)
+	if err != nil {
+		return "", err
+	}
+	return key.Key, nil
 }
 
 func getJson(url string, target interface{}) error {
@@ -86,9 +91,9 @@ func getJson(url string, target interface{}) error {
 	if err != nil {
 		return err
 	}
+	body, _ := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
-
-	return json.NewDecoder(r.Body).Decode(target)
+	return json.Unmarshal(body, target)
 }
 
 func getXML(url string, target interface{}) error {
@@ -99,8 +104,7 @@ func getXML(url string, target interface{}) error {
 	}
 	body, _ := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
-
-	return xml.Unmarshal(body, &target)
+	return xml.Unmarshal(body, target)
 }
 
 func getLatLngFromKeyWord(keyword string) (*Coordinate, error) {
@@ -124,8 +128,11 @@ func SearchPlaces(keyword string) (*Place, error) {
 	}
 	lat := fmt.Sprint(coordinate.Lat)
 	lng := fmt.Sprint(coordinate.Lng)
-	var places *Place
+	place := new(Place)
 	url := "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lng + "&radius=250&language=ja&key=" + key + "&keyword=トイレ"
-	getJson(url, places)
-	return places, nil
+	err = getJson(url, place)
+	if err != nil {
+		return nil, err
+	}
+	return place, nil
 }

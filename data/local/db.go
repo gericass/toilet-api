@@ -1,6 +1,9 @@
 package local
 
-import "database/sql"
+import (
+	"database/sql"
+	_ "github.com/go-sql-driver/mysql"
+)
 
 func txHandler(tx *sql.Tx, f func(tx *sql.Tx) error) error {
 	var err error
@@ -16,7 +19,7 @@ func txHandler(tx *sql.Tx, f func(tx *sql.Tx) error) error {
 }
 
 func ConnectDB() (*sql.DB, error) {
-	db, err := sql.Open("mysql", "root:mysql@tcp(127.0.0.1:3306)/toilet")
+	db, err := sql.Open("mysql", "root:mysql@tcp(127.0.0.1:13306)/toilet")
 	if err != nil {
 		return nil, err
 	}

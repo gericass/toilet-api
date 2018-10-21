@@ -49,3 +49,11 @@ func (toilet *Toilet) Exists(db *sql.DB) (bool, error) {
 	}
 	return false, nil
 }
+
+func (toilet *Toilet) FindToiletByGoogleId(db *sql.DB) error {
+	err := db.QueryRow("SELECT `name`, `lat`, `lng`, `image_path`, `description`, `valuation`, `updated_at` FROM toilets WHERE `google_id` = ?", toilet.GoogleId).Scan(&toilet.Name, &toilet.Lat, &toilet.Lng, &toilet.ImagePath, &toilet.Description, &toilet.Valuation, &toilet.UpdatedAt)
+	if err != nil {
+		return err
+	}
+	return nil
+}
