@@ -18,3 +18,20 @@ CREATE TABLE users (
   `icon_path`  TEXT,
   `created_at` TIMESTAMP    NOT NULL DEFAULT NOW()
 );
+
+CREATE TABLE users_toilets (
+  `id`         BIGINT UNSIGNED    AUTO_INCREMENT PRIMARY KEY,
+  `user_id`    BIGINT    NOT NULL,
+  `toilet_id`  BIGINT    NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT NOW(),
+  `updated_at` TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE reviews (
+  `id`         BIGINT UNSIGNED    AUTO_INCREMENT PRIMARY KEY,
+  `toilet_id`  BIGINT    NOT NULL,
+  `user_id`    BIGINT    NOT NULL,
+  `valuation`  FLOAT     NOT NULL,
+  `message`    TEXT,
+  `created_at` TIMESTAMP NOT NULL DEFAULT NOW()
+);
