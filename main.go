@@ -25,6 +25,7 @@ func main() {
 	e.Use(middleware.Logger())
 
 	e.POST("/login", handler.LoginHandler)
+	e.GET("/search", handler.SearchHandler)
 
 	e.Start(":8000")
 }

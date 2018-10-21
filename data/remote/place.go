@@ -5,6 +5,9 @@ import (
 	"net/http"
 	"time"
 	"encoding/json"
+	"io/ioutil"
+	"encoding/xml"
+	"fmt"
 )
 
 type Place struct {
@@ -58,6 +61,16 @@ type key struct {
 	key string
 }
 
+type Result struct {
+	Coordinate Coordinate `xml:"coordinate"`
+	Error      string     `xml:"error"`
+}
+
+type Coordinate struct {
+	Lat float64 `xml:"lat"`
+	Lng float64 `xml:"lng"`
+}
+
 func getKey() (string, error) {
 	var key key
 	_, err := toml.DecodeFile("key.toml", &key)
@@ -78,14 +91,41 @@ func getJson(url string, target interface{}) error {
 	return json.NewDecoder(r.Body).Decode(target)
 }
 
-func Search(lat string, lng string) ([]*Place, error) {
+func getXML(url string, target interface{}) error {
+	client := &http.Client{Timeout: 10 * time.Second}
+	r, err := client.Get(url)
+	if err != nil {
+		return err
+	}
+	body, _ := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+
+	return xml.Unmarshal(body, &target)
+}
+
+func getLatLngFromKeyWord(keyword string) (*Coordinate, error) {
+	result := new(Result)
+	url := "https://www.geocoding.jp/api/?v=1.1&q=" + keyword
+	err := getXML(url, result)
+	if err != nil {
+		return nil, err
+	}
+	return &result.Coordinate, nil
+}
+
+func SearchPlaces(keyword string) (*Place, error) {
+	coordinate, err := getLatLngFromKeyWord(keyword)
+	if err != nil {
+		return nil, err
+	}
 	key, err := getKey()
 	if err != nil {
 		return nil, err
 	}
-	var places []*Place
+	lat := fmt.Sprint(coordinate.Lat)
+	lng := fmt.Sprint(coordinate.Lng)
+	var places *Place
 	url := "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lng + "&radius=250&language=ja&key=" + key + "&keyword=トイレ"
 	getJson(url, places)
 	return places, nil
 }
-

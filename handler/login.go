@@ -3,20 +3,29 @@ package handler
 import (
 	"github.com/labstack/echo"
 	"net/http"
+	"github.com/gericass/toilet-api/data/local"
+	"github.com/gericass/toilet-api/handler/request"
 )
 
-type user struct {
-	GoogleId string `json:"google_id" form:"google_id" query:"google_id"`
-	Name     string `json:"name" form:"name" query:"name"`
-	Icon     string `json:"icon" form:"icon" query:"icon"`
-}
 
 func LoginHandler(c echo.Context) error {
-	i := new(user)
+	cc := c.(*CustomContext)
+	i := new(request.User)
 	err := c.Bind(i)
 	if err != nil {
 		return err
 	}
-
+	user := local.User{GoogleId: i.GoogleId, Name: i.Name, IconPath: i.Icon}
+	exists, err := user.Exists(cc.DB)
+	if err != nil {
+		return err
+	}
+	if exists {
+		return c.String(http.StatusOK, "OK")
+	}
+	err = user.Insert(cc.DB)
+	if err != nil {
+		return err
+	}
 	return c.String(http.StatusCreated, "OK")
 }
