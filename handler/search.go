@@ -5,7 +5,6 @@ import (
 	"github.com/gericass/toilet-api/data/remote"
 	"github.com/gericass/toilet-api/handler/response"
 	"net/http"
-	"log"
 	"time"
 	"database/sql"
 	"github.com/gericass/toilet-api/data/local"
@@ -47,7 +46,6 @@ func SearchHandler(c echo.Context) error {
 	cc := c.(*CustomContext)
 	places, err := remote.SearchPlaces(keyword)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	toilets := createToilets(places, cc.DB)
