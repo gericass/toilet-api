@@ -51,7 +51,7 @@ func (toilet *Toilet) Exists(db *sql.DB) (bool, error) {
 }
 
 func (toilet *Toilet) FindToiletByGoogleId(db *sql.DB) error {
-	err := db.QueryRow("SELECT `name`, `lat`, `lng`, `image_path`, `description`, `valuation`, `updated_at` FROM toilets WHERE `google_id` = ?", toilet.GoogleId).Scan(&toilet.Name, &toilet.Lat, &toilet.Lng, &toilet.ImagePath, &toilet.Description, &toilet.Valuation, &toilet.UpdatedAt)
+	err := db.QueryRow("SELECT `id`,`name`, `lat`, `lng`, `image_path`, `description`, `valuation`, `updated_at` FROM toilets WHERE `google_id` = ?", toilet.GoogleId).Scan(&toilet.ID, &toilet.Name, &toilet.Lat, &toilet.Lng, &toilet.ImagePath, &toilet.Description, &toilet.Valuation, &toilet.UpdatedAt)
 	if err != nil {
 		return err
 	}
@@ -59,7 +59,7 @@ func (toilet *Toilet) FindToiletByGoogleId(db *sql.DB) error {
 }
 
 func (toilet *Toilet) FindToiletById(db *sql.DB) error {
-	err := db.QueryRow("SELECT `name`, `lat`, `lng`, `image_path`, `description`, `valuation`, `updated_at` FROM toilets WHERE `id` = ?", toilet.ID).Scan(&toilet.Name, &toilet.Lat, &toilet.Lng, &toilet.ImagePath, &toilet.Description, &toilet.Valuation, &toilet.UpdatedAt)
+	err := db.QueryRow("SELECT `name`, `google_id`,`lat`, `lng`, `image_path`, `description`, `valuation`, `updated_at` FROM toilets WHERE `id` = ?", toilet.ID).Scan(&toilet.Name, &toilet.GoogleId, &toilet.Lat, &toilet.Lng, &toilet.ImagePath, &toilet.Description, &toilet.Valuation, &toilet.UpdatedAt)
 	if err != nil {
 		return err
 	}

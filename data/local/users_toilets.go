@@ -33,6 +33,18 @@ func (ut *UsersToilets) Insert(db *sql.DB) error {
 	return nil
 }
 
+func (ut *UsersToilets) Exists(db *sql.DB) (bool, error) {
+	var count int
+	err := db.QueryRow("SELECT count(*) FROM user_toilets WHERE `user_id` = ? AND `toilet_id` = ?", ut.UserId, ut.ToiletId).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	if count > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
 func (ut *UsersToilets) FindToiletsByUserId(db *sql.DB) ([]*UsersToilets, error) {
 	rows, err := db.Query("SELECT `user_id`,`toilet_id`, `created_at`, `updated_at` FROM users_toilets WHERE `user_id` = ?", ut.UserId)
 	if err != nil {

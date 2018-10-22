@@ -8,6 +8,7 @@ import (
 	"time"
 	"database/sql"
 	"github.com/gericass/toilet-api/data/local"
+	"github.com/gericass/toilet-api/util"
 )
 
 func assignDescription(db *sql.DB, t *response.Toilet) error {
@@ -31,11 +32,44 @@ func assignDescription(db *sql.DB, t *response.Toilet) error {
 	return nil
 }
 
-func createToilets(places *remote.Place, db *sql.DB) *response.Toilets {
+func assignFavorite(c echo.Context, db *sql.DB, t *response.Toilet) error {
+	toilet := &local.Toilet{GoogleId: t.GoogleId}
+	exists, err := toilet.Exists(db)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return nil
+	}
+	toilet.FindToiletByGoogleId(db)
+	token, err := util.GetToken(c)
+	if err != nil {
+		return err
+	}
+	user := &local.User{UID: token.UID}
+	userId, err := user.GetUserId(db)
+	if err != nil {
+		return err
+	}
+	usersToilets := &local.UsersToilets{ToiletId: toilet.ID, UserId: userId}
+	favorite, err := usersToilets.Exists(db)
+	if err != nil {
+		return err
+	}
+	if favorite {
+		t.Favorite = true
+		return nil
+	}
+	t.Favorite = false
+	return nil
+}
+
+func createToilets(c echo.Context, places *remote.Place, db *sql.DB) *response.Toilets {
 	var ts []*response.Toilet
 	for _, v := range places.Results {
 		t := &response.Toilet{Name: v.Name, GoogleId: v.PlaceID, Geolocation: v.Vicinity, Image: v.Icon, UpdatedAt: time.Now()}
 		assignDescription(db, t)
+		assignFavorite(c, db, t)
 		ts = append(ts, t)
 	}
 	return &response.Toilets{Toilets: ts}
@@ -48,6 +82,6 @@ func SearchHandler(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	toilets := createToilets(places, cc.DB)
+	toilets := createToilets(c, places, cc.DB)
 	return c.JSON(http.StatusOK, toilets)
 }
