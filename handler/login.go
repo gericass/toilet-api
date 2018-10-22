@@ -7,7 +7,6 @@ import (
 	"github.com/gericass/toilet-api/handler/request"
 )
 
-
 func LoginHandler(c echo.Context) error {
 	cc := c.(*CustomContext)
 	i := new(request.User)
@@ -15,7 +14,7 @@ func LoginHandler(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	user := local.User{GoogleId: i.GoogleId, Name: i.Name, IconPath: i.Icon}
+	user := local.User{UID: i.UID, Name: i.Name, IconPath: i.Icon}
 	exists, err := user.Exists(cc.DB)
 	if err != nil {
 		return err
