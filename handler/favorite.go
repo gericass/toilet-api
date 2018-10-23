@@ -96,6 +96,9 @@ func PostFavoriteHandler(c echo.Context) error {
 	}
 	user := &local.User{UID: token.UID}
 	userId, err := user.GetUserId(cc.DB)
+	if err != nil {
+		return err
+	}
 	usersToilets := &local.UsersToilets{ToiletId: toilet.ID, UserId: userId}
 	exists, err := usersToilets.Exists(cc.DB)
 	if err != nil {
@@ -112,6 +115,26 @@ func PostFavoriteHandler(c echo.Context) error {
 }
 
 func DeleteFavoriteHandler(c echo.Context) error {
-
-	return nil
+	cc := c.(*CustomContext)
+	placeId := c.Param("placeId")
+	toilet := &local.Toilet{GoogleId: placeId}
+	toiletId, err := toilet.GetToiletId(cc.DB)
+	if err != nil {
+		return err
+	}
+	token, err := util.GetToken(c)
+	if err != nil {
+		return err
+	}
+	user := &local.User{UID: token.UID}
+	userId, err := user.GetUserId(cc.DB)
+	if err != nil {
+		return err
+	}
+	usersToilets := &local.UsersToilets{ToiletId: toiletId, UserId: userId}
+	err = usersToilets.RemoveUsersToilets(cc.DB)
+	if err != nil {
+		return err
+	}
+	return c.String(http.StatusOK, "")
 }

@@ -65,3 +65,12 @@ func (toilet *Toilet) FindToiletById(db *sql.DB) error {
 	}
 	return nil
 }
+
+func (toilet *Toilet) GetToiletId(db *sql.DB) (int64, error) {
+	var id int64
+	err := db.QueryRow("SELECT `id` FROM toilets WHERE `google_id` = ?", toilet.GoogleId).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
