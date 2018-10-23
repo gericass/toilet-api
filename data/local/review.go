@@ -58,6 +58,18 @@ func (review *Review) ExistsByToiletId(db *sql.DB) (bool, error) {
 	return false, nil
 }
 
+func (review *Review) ExistsByUserId(db *sql.DB) (bool, error) {
+	var count int
+	err := db.QueryRow("SELECT count(*) FROM reviews WHERE `user_id` = ?", review.UserId).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	if count > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
 func (review *Review) FindReviewsByToiletId(db *sql.DB) ([]*Review, error) {
 	rows, err := db.Query("SELECT `id`,`toilet_id`, `user_id`, `valuation`, `message`, `created_at` FROM reviews WHERE `toilet_id` = ? LIMIT 50", review.ToiletId)
 	if err != nil {

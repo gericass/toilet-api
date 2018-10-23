@@ -74,8 +74,7 @@ func GetToiletReview(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	rs := ConvertReviews(reviews, cc.DB)
-	resp := &response.Reviews{Reviews: rs, Status: "OK"}
+	resp := ConvertReviews(reviews, cc.DB)
 
 	return c.JSON(http.StatusOK, resp)
 }

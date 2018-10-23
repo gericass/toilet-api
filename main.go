@@ -50,7 +50,8 @@ func main() {
 	e.POST("/review", handler.PostReview)
 	e.DELETE("/review/:toiletId", handler.DeleteReview)
 
-	e.GET("/user/:uid")
+	e.GET("/user/:uid", handler.GetUserHandler)
+	e.GET("/user/:uid/review", handler.GetUserReviewHandler)
 
 	e.Start(":8000")
 }

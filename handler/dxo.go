@@ -16,7 +16,7 @@ func ConvertUser(user *local.User) *response.User {
 	return u
 }
 
-func ConvertReviews(reviews []*local.Review, db *sql.DB) []*response.Review {
+func ConvertReviews(reviews []*local.Review, db *sql.DB) *response.Reviews {
 	var rs []*response.Review
 	for _, v := range reviews {
 		user := &local.User{ID: v.UserId}
@@ -29,7 +29,7 @@ func ConvertReviews(reviews []*local.Review, db *sql.DB) []*response.Review {
 		}
 		rs = append(rs, r)
 	}
-	return rs
+	return &response.Reviews{Reviews: rs, Status: "OK"}
 }
 
 func ConvertToilets(toilets []*local.Toilet) *response.Toilets {
@@ -46,7 +46,7 @@ func ConvertToilets(toilets []*local.Toilet) *response.Toilets {
 		}
 		respToilets = append(respToilets, t)
 	}
-	return &response.Toilets{Toilets: respToilets}
+	return &response.Toilets{Toilets: respToilets, Status: "OK"}
 }
 
 func ConvertPlaceDetailToToilet(pd *remote.PlaceDetail) *local.Toilet {
