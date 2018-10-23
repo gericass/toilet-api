@@ -47,17 +47,35 @@ func GetToiletReview(c echo.Context) error {
 	cc := c.(*CustomContext)
 	googleId := c.Param("toiletId")
 	toilet := &local.Toilet{GoogleId: googleId}
+	toiletExists, err := toilet.Exists(cc.DB)
+	if err != nil {
+		return err
+	}
+	if !toiletExists {
+		notExists := new(response.Reviews)
+		notExists.Status = "ToiletEmpty"
+		return c.JSON(http.StatusOK, notExists)
+	}
 	toiletId, err := toilet.GetToiletId(cc.DB)
 	if err != nil {
 		return err
 	}
 	review := &local.Review{ToiletId: toiletId}
+	reviewExists, err := review.ExistsByToiletId(cc.DB)
+	if err != nil {
+		return err
+	}
+	if !reviewExists {
+		notExists := new(response.Reviews)
+		notExists.Status = "ReviewEmpty"
+		return c.JSON(http.StatusOK, notExists)
+	}
 	reviews, err := review.FindReviewsByToiletId(cc.DB)
 	if err != nil {
 		return err
 	}
 	rs := ConvertReviews(reviews, cc.DB)
-	resp := &response.Reviews{Reviews: rs}
+	resp := &response.Reviews{Reviews: rs, Status: "OK"}
 
 	return c.JSON(http.StatusOK, resp)
 }

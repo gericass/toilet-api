@@ -7,6 +7,7 @@ import (
 	"github.com/gericass/toilet-api/data/local"
 	"github.com/gericass/toilet-api/handler/request"
 	"github.com/gericass/toilet-api/data/remote"
+	"github.com/gericass/toilet-api/handler/response"
 )
 
 func GetFavoriteHandler(c echo.Context) error {
@@ -17,7 +18,19 @@ func GetFavoriteHandler(c echo.Context) error {
 	}
 	user := &local.User{UID: token.UID}
 	userId, err := user.GetUserId(cc.DB)
+	if err != nil {
+		return err
+	}
 	usersToilets := &local.UsersToilets{UserId: userId}
+	exists, err := usersToilets.ExistsByUserId(cc.DB)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		r := new(response.Reviews)
+		r.Status = "FavoriteEmpty"
+		return c.JSON(http.StatusOK, r)
+	}
 	usersToiletsList, err := usersToilets.FindToiletsByUserId(cc.DB)
 	if err != nil {
 		return err
