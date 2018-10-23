@@ -8,6 +8,7 @@ import (
 	"github.com/gericass/toilet-api/handler/request"
 	"database/sql"
 	"github.com/gericass/toilet-api/data/remote"
+	"github.com/gericass/toilet-api/handler/response"
 )
 
 func insertToilet(db *sql.DB, googleId string) error {
@@ -55,7 +56,8 @@ func GetToiletReview(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	resp := ConvertReviews(reviews)
+	rs := ConvertReviews(reviews, cc.DB)
+	resp := &response.Reviews{Reviews: rs}
 
 	return c.JSON(http.StatusOK, resp)
 }

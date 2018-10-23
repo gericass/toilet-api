@@ -4,14 +4,26 @@ import (
 	"github.com/gericass/toilet-api/handler/response"
 	"github.com/gericass/toilet-api/data/local"
 	"github.com/gericass/toilet-api/data/remote"
+	"database/sql"
 )
 
-func ConvertReviews(reviews []*local.Review) []*response.Review {
+func ConvertUser(user *local.User) *response.User {
+	u := &response.User{
+		Name:     user.Name,
+		UID:      user.UID,
+		IconPath: user.IconPath,
+	}
+	return u
+}
+
+func ConvertReviews(reviews []*local.Review, db *sql.DB) []*response.Review {
 	var rs []*response.Review
 	for _, v := range reviews {
+		user := &local.User{ID: v.UserId}
+		user.FindUserById(db)
 		r := &response.Review{
 			ToiletId:  v.ToiletId,
-			UserId:    v.UserId,
+			User:      ConvertUser(user),
 			Valuation: v.Valuation,
 			CreatedAt: v.CreatedAt,
 		}

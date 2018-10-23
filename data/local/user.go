@@ -33,6 +33,14 @@ func (user *User) Insert(db *sql.DB) error {
 	return nil
 }
 
+func (user *User) FindUserById(db *sql.DB) error {
+	err := db.QueryRow("SELECT users(`id`, `name`, `uid`, `icon_path`, `created_at`) FROM users WHERE `id` = ?", user.ID).Scan(&user.ID, &user.Name, &user.UID, &user.IconPath, &user.CreatedAt)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (user *User) Exists(db *sql.DB) (bool, error) {
 	var count int
 	err := db.QueryRow("SELECT count(*) FROM users WHERE `uid` = ?", user.UID).Scan(&count)
