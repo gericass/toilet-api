@@ -70,7 +70,7 @@ func (ut *UsersToilets) FindToiletsByUserId(db *sql.DB) ([]*UsersToilets, error)
 	return usersToilets, nil
 }
 
-func (ut *UsersToilets) RemoveUsersToilets(db *sql.DB) error {
+func (ut *UsersToilets) DeleteUsersToilets(db *sql.DB) error {
 	tx, err := db.Begin()
 	if err != nil {
 		return err

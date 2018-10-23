@@ -5,39 +5,9 @@ import (
 	"github.com/gericass/toilet-api/util"
 	"net/http"
 	"github.com/gericass/toilet-api/data/local"
-	"github.com/gericass/toilet-api/handler/response"
 	"github.com/gericass/toilet-api/handler/request"
 	"github.com/gericass/toilet-api/data/remote"
 )
-
-func convertToilets(toilets []*local.Toilet) *response.Toilets {
-	var respToilets []*response.Toilet
-	for _, v := range toilets {
-		t := &response.Toilet{
-			Name:        v.Name,
-			GoogleId:    v.GoogleId,
-			Geolocation: v.Geolocation,
-			Image:       v.ImagePath,
-			Description: v.Description,
-			Valuation:   v.Valuation,
-			UpdatedAt:   v.UpdatedAt,
-		}
-		respToilets = append(respToilets, t)
-	}
-	return &response.Toilets{Toilets: respToilets}
-}
-
-func convertPlaceDetailToToilet(pd *remote.PlaceDetail) *local.Toilet {
-	t := &local.Toilet{
-		Name:        pd.Result.Name,
-		GoogleId:    pd.Result.PlaceID,
-		Lat:         pd.Result.Geometry.Location.Lat,
-		Lng:         pd.Result.Geometry.Location.Lng,
-		Geolocation: pd.Result.FormattedAddress,
-		ImagePath:   pd.Result.Icon,
-	}
-	return t
-}
 
 func GetFavoriteHandler(c echo.Context) error {
 	cc := c.(*CustomContext)
@@ -58,7 +28,7 @@ func GetFavoriteHandler(c echo.Context) error {
 		t.FindToiletByGoogleId(cc.DB)
 		toilets = append(toilets, t)
 	}
-	resp := convertToilets(toilets)
+	resp := ConvertToilets(toilets)
 	return c.JSON(http.StatusOK, resp)
 }
 
@@ -79,7 +49,7 @@ func PostFavoriteHandler(c echo.Context) error {
 		if err != nil {
 			return err
 		}
-		t := convertPlaceDetailToToilet(placeDetail)
+		t := ConvertPlaceDetailToToilet(placeDetail)
 		err = t.Insert(cc.DB)
 		if err != nil {
 			return err
@@ -111,12 +81,12 @@ func PostFavoriteHandler(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.String(http.StatusCreated, "")
+	return c.NoContent(http.StatusCreated)
 }
 
 func DeleteFavoriteHandler(c echo.Context) error {
 	cc := c.(*CustomContext)
-	placeId := c.Param("placeId")
+	placeId := c.Param("toiletId")
 	toilet := &local.Toilet{GoogleId: placeId}
 	toiletId, err := toilet.GetToiletId(cc.DB)
 	if err != nil {
@@ -132,9 +102,9 @@ func DeleteFavoriteHandler(c echo.Context) error {
 		return err
 	}
 	usersToilets := &local.UsersToilets{ToiletId: toiletId, UserId: userId}
-	err = usersToilets.RemoveUsersToilets(cc.DB)
+	err = usersToilets.DeleteUsersToilets(cc.DB)
 	if err != nil {
 		return err
 	}
-	return c.String(http.StatusOK, "")
+	return c.NoContent(http.StatusOK)
 }

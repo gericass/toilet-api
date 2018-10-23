@@ -44,7 +44,11 @@ func main() {
 
 	e.GET("/favorite", handler.GetFavoriteHandler)
 	e.POST("/favorite", handler.PostFavoriteHandler)
-	e.DELETE("/favorite/:placeId", handler.DeleteFavoriteHandler)
+	e.DELETE("/favorite/:toiletId", handler.DeleteFavoriteHandler)
+
+	e.GET("/review/:toiletId", handler.GetToiletReview)
+	e.POST("/review", handler.PostReview)
+	e.DELETE("/review/:toiletId", handler.DeleteReview)
 
 	e.Start(":8000")
 }
