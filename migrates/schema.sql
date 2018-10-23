@@ -2,7 +2,7 @@
 CREATE TABLE toilets (
   `id`          BIGINT UNSIGNED       AUTO_INCREMENT PRIMARY KEY,
   `name`        VARCHAR(255) NOT NULL,
-  `uid`         VARCHAR(255) NOT NULL,
+  `google_id`   VARCHAR(255) NOT NULL,
   `lat`         FLOAT        NOT NULL,
   `lng`         FLOAT        NOT NULL,
   `geolocation` VARCHAR(255) NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE toilets (
 CREATE TABLE users (
   `id`         BIGINT UNSIGNED       AUTO_INCREMENT PRIMARY KEY,
   `name`       VARCHAR(255) NOT NULL,
-  `google_id`  VARCHAR(255) NOT NULL,
+  `uid`        VARCHAR(255) NOT NULL,
   `icon_path`  TEXT,
   `created_at` TIMESTAMP    NOT NULL DEFAULT NOW()
 );
@@ -36,6 +36,16 @@ CREATE TABLE reviews (
   `message`    TEXT,
   `created_at` TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE users
+  ADD INDEX uid_index(uid);
+ALTER TABLE toilets
+  ADD INDEX google_index(google_id);
+
+ALTER TABLE users
+  ADD INDEX id_index(id);
+ALTER TABLE toilets
+  ADD INDEX id_index(id);
 
 -- +migrate Down
 DROP TABLE toilets;
