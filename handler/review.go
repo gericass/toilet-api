@@ -21,7 +21,25 @@ func insertToilet(db *sql.DB, googleId string) error {
 		return err
 	}
 	return nil
+}
 
+func updateValuation(db *sql.DB, toiletId int64) error {
+	review := &local.Review{ToiletId: toiletId}
+	reviews, err := review.FindReviewsByToiletId(db)
+	if err != nil {
+		return err
+	}
+	var sum float64 = 0
+	for _, v := range reviews {
+		sum = sum + v.Valuation
+	}
+	valuation := sum / float64(len(reviews))
+	toilet := &local.Toilet{Valuation: valuation}
+	err = toilet.UpdateValuation(db)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func GetToiletReview(c echo.Context) error {
@@ -86,6 +104,14 @@ func PostReview(c echo.Context) error {
 	if exists {
 		return c.String(http.StatusCreated, "already exists")
 	}
+	err = review.Insert(cc.DB)
+	if err != nil {
+		return err
+	}
+	err = updateValuation(cc.DB, toiletId)
+	if err != nil {
+		return err
+	}
 	return c.NoContent(http.StatusCreated)
 }
 
@@ -108,6 +134,10 @@ func DeleteReview(c echo.Context) error {
 	}
 	review := &local.Review{ToiletId: toiletId, UserId: userId}
 	err = review.DeleteReview(cc.DB)
+	if err != nil {
+		return err
+	}
+	err = updateValuation(cc.DB, toiletId)
 	if err != nil {
 		return err
 	}

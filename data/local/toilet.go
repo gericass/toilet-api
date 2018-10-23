@@ -74,3 +74,23 @@ func (toilet *Toilet) GetToiletId(db *sql.DB) (int64, error) {
 	}
 	return id, nil
 }
+
+func (toilet *Toilet) UpdateValuation(db *sql.DB) error {
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	f := func(tx *sql.Tx) error {
+		query := "UPDATE toilets SET `valuation` = ? WHERE `toilet_id` = ?"
+		_, err := tx.Exec(query, toilet.Valuation, toilet.ID)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	err = txHandler(tx, f)
+	if err != nil {
+		return err
+	}
+	return nil
+}

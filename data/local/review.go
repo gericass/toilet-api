@@ -47,7 +47,7 @@ func (review *Review) Exists(db *sql.DB) (bool, error) {
 }
 
 func (review *Review) FindReviewsByToiletId(db *sql.DB) ([]*Review, error) {
-	rows, err := db.Query("SELECT `id`,`toilet_id`, `user_id`, `valuation`, `message`, `created_at` FROM reviews WHERE `toilet_id` = ?", review.ToiletId)
+	rows, err := db.Query("SELECT `id`,`toilet_id`, `user_id`, `valuation`, `message`, `created_at` FROM reviews WHERE `toilet_id` = ? LIMIT 50", review.ToiletId)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (review *Review) FindReviewsByToiletId(db *sql.DB) ([]*Review, error) {
 }
 
 func (review *Review) FindReviewsByUserId(db *sql.DB) ([]*Review, error) {
-	rows, err := db.Query("SELECT `id`,`toilet_id`, `user_id`, `valuation`, `message`, `created_at` FROM reviews WHERE `user_id` = ?", review.UserId)
+	rows, err := db.Query("SELECT `id`,`toilet_id`, `user_id`, `valuation`, `message`, `created_at` FROM reviews WHERE `user_id` = ? LIMIT 50", review.UserId)
 	if err != nil {
 		return nil, err
 	}
