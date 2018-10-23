@@ -1,7 +1,8 @@
+-- +migrate Up
 CREATE TABLE toilets (
   `id`          BIGINT UNSIGNED       AUTO_INCREMENT PRIMARY KEY,
   `name`        VARCHAR(255) NOT NULL,
-  `uid`        VARCHAR(255) NOT NULL,
+  `uid`         VARCHAR(255) NOT NULL,
   `lat`         FLOAT        NOT NULL,
   `lng`         FLOAT        NOT NULL,
   `geolocation` VARCHAR(255) NOT NULL,
@@ -35,3 +36,9 @@ CREATE TABLE reviews (
   `message`    TEXT,
   `created_at` TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+-- +migrate Down
+DROP TABLE toilets;
+DROP TABLE users;
+DROP TABLE users_toilets;
+DROP TABLE reviews;

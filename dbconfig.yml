@@ -1,0 +1,4 @@
+development:
+  dialect: mysql
+  datasource: root:mysql@tcp(127.0.0.1:13306)/toilet?parseTime=true
+  dir: .

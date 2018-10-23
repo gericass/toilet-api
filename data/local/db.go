@@ -19,7 +19,7 @@ func txHandler(tx *sql.Tx, f func(tx *sql.Tx) error) error {
 }
 
 func ConnectDB() (*sql.DB, error) {
-	db, err := sql.Open("mysql", "root:mysql@tcp(127.0.0.1:13306)/toilet")
+	db, err := sql.Open("mysql", "root:mysql@tcp(127.0.0.1:13306)/toilet?parseTime=true")
 	if err != nil {
 		return nil, err
 	}
