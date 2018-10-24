@@ -23,10 +23,9 @@ func dbMiddleware(h echo.HandlerFunc) echo.HandlerFunc {
 
 func validateToken(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		forbidden := c.String(http.StatusForbidden, "Forbidden")
 		_, err := util.GetToken(c)
 		if err != nil {
-			return forbidden
+			return c.String(http.StatusForbidden, "Forbidden")
 		}
 		return next(c)
 	}
